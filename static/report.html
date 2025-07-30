@@ -515,14 +515,14 @@
                     
                     <div class="form-grid">
                         <div class="form-group">
-                            <label class="form-label">العمر <span class="required">*</span></label>
-                            <input type="number" class="form-input" name="patient_age" min="0" max="120" required>
+                            <label for="patient_age" class="form-label">العمر <span class="required">*</span></label>
+                            <input type="number" id="patient_age" class="form-input" name="patient_age" min="0" max="120" required>
                             <div class="error-message">يرجى إدخال عمر صحيح</div>
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">الجنس <span class="required">*</span></label>
-                            <select class="form-select" name="patient_gender" required>
+                            <label for="patient_gender" class="form-label">الجنس <span class="required">*</span></label>
+                            <select id="patient_gender" class="form-select" name="patient_gender" required>
                                 <option value="">اختر الجنس</option>
                                 <option value="ذكر">ذكر</option>
                                 <option value="أنثى">أنثى</option>
@@ -532,13 +532,13 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">الوزن (كيلوغرام)</label>
-                            <input type="number" class="form-input" name="patient_weight" min="0" step="0.1" placeholder="مثال: 70">
+                            <label for="patient_weight" class="form-label">الوزن (كيلوغرام)</label>
+                            <input type="number" id="patient_weight" class="form-input" name="patient_weight" min="0" step="0.1" placeholder="مثال: 70">
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">الطول (سم)</label>
-                            <input type="number" class="form-input" name="patient_height" min="0" step="0.1" placeholder="مثال: 170">
+                            <label for="patient_height" class="form-label">الطول (سم)</label>
+                            <input type="number" id="patient_height" class="form-input" name="patient_height" min="0" step="0.1" placeholder="مثال: 170">
                         </div>
                     </div>
                     
@@ -559,8 +559,8 @@
                     
                     <div class="form-grid">
                         <div class="form-group full-width">
-                            <label class="form-label">اسم الدواء <span class="required">*</span></label>
-                            <input type="text" class="form-input" name="drug_name" required placeholder="مثال: بروفين، بانادول، أسبرين...">
+                            <label for="drug_name" class="form-label">اسم الدواء <span class="required">*</span></label>
+                            <input type="text" id="drug_name" class="form-input" name="drug_name" required placeholder="مثال: بروفين، بانادول، أسبرين...">
                             <div class="error-message">يرجى إدخال اسم الدواء</div>
                         </div>
                         

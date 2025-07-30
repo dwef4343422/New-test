@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: pharmacovigilance-iraq
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python fix_database_schema.py && echo "Schema migration completed"
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app --timeout 120 --workers 2
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pharmacovigilance-db
+          property: connectionString
+      - key: GOOGLE_SHEET_ID
+        value: ""
+      - key: GOOGLE_SERVICE_ACCOUNT_EMAIL
+        value: ""
+      - key: GOOGLE_PRIVATE_KEY
+        value: ""
+    healthCheckPath: /health
+    autoDeploy: true
+
+databases:
+  - name: pharmacovigilance-db
+    databaseName: pharmacovigilance
+    user: pharmacovigilance_user
+    plan: free
+

@@ -1,431 +1,543 @@
 // Report page functionality
 
-// Report application namespace
-const ReportApp = {
-    currentStep: 1,
-    totalSteps: 5,
-    formData: {},
+document.addEventListener('DOMContentLoaded', function() {
+    initializeReportPage();
+});
 
-    // Initialize report page
-    init() {
-        this.loadGovernorates();
-        this.setupFormSubmissions();
-        this.setupStepNavigation();
-        this.updateProgressBar();
-        this.setupRealTimeValidation();
-        // The form handler is now managed directly within this script.
-    },
+let currentStep = 1;
+const totalSteps = 5;
+const formData = {};
 
-    /**
-     * Shows a message to the user in the status box.
-     * Assumes an element with id="report-status" exists in the HTML.
-     * @param {string} msg - The message to display.
-     * @param {string} type - The message type ('success', 'error', 'info').
-     */
-    showMessage(msg, type = "info") {
-        const statusBox = document.getElementById("report-status");
-        if (statusBox) {
-            const alertType = type === 'error' ? 'alert-danger' : 'alert-success';
-            statusBox.innerHTML = `
-              <div class="alert ${alertType}">
-                ${msg}
-              </div>
-            `;
-            statusBox.scrollIntoView({ behavior: "smooth" });
-        } else {
-            // Fallback to console if status box is not found
-            console[type === 'error' ? 'error' : 'log'](msg);
-        }
-    },
+function initializeReportPage() {
+    loadGovernorates();
+    setupFormSubmissions();
+    setupStepNavigation();
+    setupMobileNavigation();
+    updateProgressBar();
+    setupRealTimeValidation();
+}
 
-    // Load governorates into the select dropdown
-    async loadGovernorates() {
-        try {
-            // In a real application, you might fetch this from an API.
-            // Using a fallback list for demonstration.
-            const governorates = [
-                'بغداد', 'البصرة', 'نينوى', 'أربيل', 'النجف', 'كربلاء', 'الأنبار',
-                'ديالى', 'ذي قار', 'المثنى', 'القادسية', 'بابل', 'كركوك', 'واسط',
-                'صلاح الدين', 'ميسان', 'دهوك', 'السليمانية'
-            ];
-            this.populateGovernorateSelects(governorates);
-        } catch (error) {
-            console.error('Error loading governorates:', error);
-            this.showMessage('فشل تحميل قائمة المحافظات.', 'error');
-        }
-    },
+// Mobile Navigation Toggle
+function setupMobileNavigation() {
+    const navToggle = document.getElementById('nav-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
 
-    // Helper function to populate the governorate select element
-    populateGovernorateSelects(governorates) {
-        const select = document.querySelector('select[name="governorate"]');
-        if (select) {
-            while (select.children.length > 1) {
-                select.removeChild(select.lastChild);
-            }
-            governorates.forEach(gov => {
-                const option = document.createElement('option');
-                option.value = gov;
-                option.textContent = gov;
-                select.appendChild(option);
+    if (navToggle && mobileMenu) {
+        navToggle.addEventListener('click', () => {
+            navToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking on a link
+        const mobileLinks = mobileMenu.querySelectorAll('.nav-link');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navToggle.classList.remove('active');
+                mobileMenu.classList.remove('active');
             });
-        }
-    },
-
-    // Set up the main form submission listener
-    setupFormSubmissions() {
-        // The form ID is taken from your original script.
-        const form = document.getElementById('pharmacovigilance-form');
-        if (form) {
-            form.addEventListener('submit', (event) => this.handleFormSubmit(event));
-        }
-    },
-
-    /**
-     * Handles the final form submission.
-     * This function now incorporates the logic from your "fix" script.
-     * @param {Event} event - The form submission event.
-     */
-    async handleFormSubmit(event) {
-        event.preventDefault();
-        this.showMessage(''); // Clear previous messages
-
-        // Save data from the final step
-        this.saveStepData(this.currentStep);
-
-        // --- Logic from the "fix" script starts here ---
-
-        // Final validation before submission
-        const requiredFields = {
-            drug_name: 'اسم الدواء',
-            reaction_description: 'وصف الأثر الجانبي',
-            governorate: 'المحافظة'
-        };
-
-        for (const field in requiredFields) {
-            if (!this.formData[field] || this.formData[field].trim() === "") {
-                this.showMessage(`الرجاء ملء الحقل الإلزامي: ${requiredFields[field]}`, "error");
-                // Navigate to the step containing the invalid field
-                const fieldElement = document.querySelector(`[name="${field}"]`);
-                if (fieldElement) {
-                   const stepElement = fieldElement.closest('.form-step');
-                   if (stepElement) {
-                       this.showStep(parseInt(stepElement.dataset.step, 10));
-                   }
-                }
-                return;
-            }
-        }
-
-        const submitButton = event.target.querySelector('button[type="submit"]');
-        const originalButtonText = submitButton.innerHTML;
-        submitButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...`;
-        submitButton.disabled = true;
-
-        try {
-            const reportData = this.mapFormDataToBackend(this.formData);
-            console.log('Sending report data:', reportData);
-
-            // Using the fetch logic from your "fix"
-            const res = await fetch("/api/submit_report", { // Endpoint from original script
-                method: "POST",
-                headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
-                credentials: "include",
-                body: JSON.stringify(reportData)
-            });
-
-            const data = await res.json();
-
-            if (res.ok) {
-                this.showMessage("تم إرسال التقرير بنجاح. شكراً لمساهمتك.", "success");
-                this.clearFormData();
-                this.resetForm();
-            } else {
-                this.showMessage(data.message || "حدث خطأ أثناء إرسال التقرير", "error");
-            }
-        } catch (err) {
-            console.error(err);
-            this.showMessage("فشل الاتصال بالخادم. حاول مرة أخرى لاحقاً.", "error");
-        } finally {
-            // Restore button state
-            submitButton.innerHTML = originalButtonText;
-            submitButton.disabled = false;
-        }
-    },
-
-    // Maps the multi-step form data to the format expected by the backend.
-    mapFormDataToBackend(formData) {
-        const reportId = 'ADR-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-        return {
-            id: reportId,
-            patient_age: formData.patient_age || '',
-            patient_gender: formData.patient_gender || '',
-            patient_weight: formData.patient_weight || '',
-            patient_height: formData.patient_height || '',
-            drug_name: formData.drug_name || '',
-            drug_manufacturer: formData.drug_manufacturer || '',
-            drug_batch_number: formData.drug_batch || '',
-            drug_dosage: formData.drug_dosage || '',
-            drug_route: formData.drug_route || '',
-            drug_indication: formData.drug_indication || '',
-            drug_start_date: formData.drug_start_date || '',
-            reaction_description: formData.reaction_description || '',
-            reaction_severity: formData.reaction_severity || '',
-            reaction_start_date: formData.reaction_start_date || '',
-            reaction_end_date: formData.reaction_end_date || '',
-            reaction_outcome: formData.outcome || '',
-            reporter_name: formData.reporter_name || '',
-            reporter_phone: formData.reporter_phone || '',
-            reporter_email: formData.reporter_email || '',
-            reporter_type: formData.reporter_type || '',
-            governorate: formData.governorate || '',
-            city: formData.city || '',
-            pharmacy_name: formData.pharmacy_name || '',
-            pharmacy_address: formData.pharmacy_address || '',
-            concomitant_drugs: formData.concomitant_drugs || '',
-            medical_history: formData.medical_history || '',
-            status: 'pending',
-            priority: 'normal',
-            assigned_to: '',
-            follow_up_required: false,
-            report_date: new Date().toISOString()
-        };
-    },
-
-    // Saves data from the current step into the formData object
-    saveStepData(step) {
-        const stepElement = document.querySelector(`.form-step[data-step="${step}"]`);
-        if (!stepElement) return;
-
-        const inputs = stepElement.querySelectorAll('input, textarea, select');
-        inputs.forEach(input => {
-            if (input.type === 'checkbox') {
-                this.formData[input.name] = input.checked;
-            } else if (input.type === 'radio') {
-                if (input.checked) {
-                    this.formData[input.name] = input.value;
-                }
-            } else {
-                this.formData[input.name] = input.value;
-            }
         });
-        console.log('Current form data:', this.formData);
-    },
 
-    // Clears the collected form data
-    clearFormData() {
-        this.formData = {};
-    },
-
-    // Resets the entire form to its initial state
-    resetForm() {
-        this.currentStep = 1;
-        this.updateProgressBar();
-        this.showStep(1);
-        const form = document.getElementById('pharmacovigilance-form');
-        if (form) {
-            form.reset();
-        }
-    },
-
-    // Setup navigation (no changes needed here)
-    setupStepNavigation() {
-        console.log('Step navigation is handled by inline onclick handlers.');
-    },
-
-    // Updates the visual progress bar
-    updateProgressBar() {
-        const progressLine = document.getElementById('progress-line');
-        const progressSteps = document.querySelectorAll('.progress-step');
-        
-        const progressPercentage = ((this.currentStep - 1) / (this.totalSteps - 1)) * 100;
-        if (progressLine) {
-            progressLine.style.width = progressPercentage + '%';
-        }
-        
-        progressSteps.forEach((step, index) => {
-            const stepNumber = index + 1;
-            const circle = step.querySelector('.step-circle');
-            step.classList.remove('active', 'completed');
-            
-            if (stepNumber < this.currentStep) {
-                step.classList.add('completed');
-                if (circle) circle.innerHTML = '<i class="fas fa-check"></i>';
-            } else if (stepNumber === this.currentStep) {
-                step.classList.add('active');
-                if (circle) circle.innerHTML = stepNumber;
-            } else {
-                if (circle) circle.innerHTML = stepNumber;
-            }
-        });
-    },
-
-    // Shows the specified step number
-    showStep(stepNumber) {
-        document.querySelectorAll('.form-step').forEach(step => {
-            step.classList.remove('active');
-        });
-        
-        const stepElement = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
-        if (stepElement) {
-            stepElement.classList.add('active');
-            stepElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        
-        this.currentStep = stepNumber;
-        this.updateProgressBar();
-    },
-
-    // Validates required fields within a single step
-    validateStep(stepNumber) {
-        const currentStepElement = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
-        if (!currentStepElement) return false;
-        
-        const requiredFields = currentStepElement.querySelectorAll('[required]');
-        let isValid = true;
-
-        requiredFields.forEach(field => {
-            const formGroup = field.closest('.form-group');
-            if (!field.value || !field.value.trim()) {
-                if (formGroup) formGroup.classList.add('error');
-                isValid = false;
-            } else {
-                if (formGroup) formGroup.classList.remove('error');
-            }
-        });
-        
-        if (!isValid) {
-            this.showMessage('الرجاء ملء جميع الحقول المطلوبة في هذه الخطوة.', 'error');
-        }
-
-        return isValid;
-    },
-
-    // Logic for the "Next" button
-    nextStep() {
-        if (this.validateStep(this.currentStep)) {
-            this.saveStepData(this.currentStep);
-            
-            if (this.currentStep < this.totalSteps) {
-                // Generate summary on the step before last
-                if (this.currentStep === this.totalSteps - 1) {
-                    this.generateSummary();
-                }
-                this.showStep(this.currentStep + 1);
-            }
-        }
-    },
-
-    // Logic for the "Previous" button
-    prevStep() {
-        if (this.currentStep > 1) {
-            this.showStep(this.currentStep - 1);
-        }
-    },
-
-    // Generates the final summary view before submission
-    generateSummary() {
-        const summaryContainer = document.getElementById('form-summary');
-        if (!summaryContainer) return;
-        
-        // Save data from the penultimate step before generating summary
-        this.saveStepData(this.totalSteps - 1);
-
-        const sections = [
-            {
-                title: 'معلومات المريض',
-                icon: 'fas fa-user',
-                fields: [
-                    { key: 'patient_age', label: 'العمر' },
-                    { key: 'patient_gender', label: 'الجنس' },
-                    { key: 'patient_weight', label: 'الوزن (كغ)' },
-                    { key: 'patient_height', label: 'الطول (سم)' }
-                ]
-            },
-            {
-                title: 'معلومات الدواء',
-                icon: 'fas fa-pills',
-                fields: [
-                    { key: 'drug_name', label: 'اسم الدواء' },
-                    { key: 'drug_manufacturer', label: 'الشركة المصنعة' },
-                    { key: 'drug_batch', label: 'رقم الدفعة' },
-                    { key: 'drug_dosage', label: 'الجرعة' }
-                ]
-            },
-            {
-                title: 'الأثر الجانبي',
-                icon: 'fas fa-exclamation-triangle',
-                fields: [
-                    { key: 'reaction_description', label: 'وصف الأثر الجانبي' },
-                    { key: 'reaction_severity', label: 'الشدة' },
-                    { key: 'outcome', label: 'النتيجة' }
-                ]
-            },
-            {
-                title: 'الموقع والمبلغ',
-                icon: 'fas fa-map-marker-alt',
-                fields: [
-                    { key: 'governorate', label: 'المحافظة' },
-                    { key: 'city', label: 'المدينة' },
-                    { key: 'reporter_name', label: 'اسم المبلغ' },
-                    { key: 'reporter_phone', label: 'رقم الهاتف' }
-                ]
-            }
-        ];
-
-        let summaryHTML = '<h2>ملخص التقرير</h2>';
-        
-        sections.forEach(section => {
-            let sectionHasContent = false;
-            let sectionHTML = `
-                <div class="summary-section">
-                    <h3><i class="${section.icon}"></i> ${section.title}</h3>`;
-            
-            section.fields.forEach(field => {
-                const value = this.formData[field.key] || '';
-                if (value && value.trim() !== '') {
-                    sectionHasContent = true;
-                    sectionHTML += `
-                        <div class="summary-item">
-                            <span class="summary-label">${field.label}:</span>
-                            <span class="summary-value">${value}</span>
-                        </div>
-                    `;
-                }
-            });
-            
-            sectionHTML += '</div>';
-            if (sectionHasContent) {
-                summaryHTML += sectionHTML;
-            }
-        });
-        
-        summaryContainer.innerHTML = summaryHTML;
-    },
-
-    // Adds input event listeners for real-time validation feedback
-    setupRealTimeValidation() {
-        document.addEventListener('input', function(e) {
-            if (e.target.matches('input[required], select[required], textarea[required]')) {
-                const formGroup = e.target.closest('.form-group');
-                if (e.target.value.trim()) {
-                    if (formGroup) formGroup.classList.remove('error');
-                }
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+                navToggle.classList.remove('active');
+                mobileMenu.classList.remove('active');
             }
         });
     }
-};
+}
 
-// --- Global Setup ---
+async function loadGovernorates() {
+    const fallbackGovernorates = [
+        'بغداد', 'البصرة', 'نينوى', 'أربيل', 'النجف', 'كربلاء', 'الأنبار',
+        'ديالى', 'ذي قار', 'المثنى', 'القادسية', 'بابل', 'كركوك', 'واسط',
+        'صلاح الدين', 'ميسان', 'دهوك', 'السليمانية'
+    ];
+    populateGovernorateSelects(fallbackGovernorates);
+}
 
-// Initialize the application once the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    ReportApp.init();
-});
+function populateGovernorateSelects(governorates) {
+    const select = document.querySelector('select[name="governorate"]');
+    if (select) {
+        // Clear existing options except the first one
+        while (select.children.length > 1) {
+            select.removeChild(select.lastChild);
+        }
+        
+        // Add governorate options
+        governorates.forEach(gov => {
+            const option = document.createElement('option');
+            option.value = gov;
+            option.textContent = gov;
+            select.appendChild(option);
+        });
+    }
+}
 
-// Make key functions globally available for inline onclick attributes in the HTML
-window.nextStep = () => ReportApp.nextStep();
-window.prevStep = () => ReportApp.prevStep();
+function setupFormSubmissions() {
+    const form = document.getElementById('pharmacovigilance-form');
+    if (form) {
+        // Remove any existing event listeners
+        form.removeEventListener('submit', handleFormSubmit);
+        // Add the event listener
+        form.addEventListener('submit', handleFormSubmit);
+        console.log('Form submission handler attached successfully');
+    } else {
+        console.error('Form element not found!');
+    }
+}
 
-// Export the main app object for debugging or potential extension
-window.ReportApp = ReportApp;
+async function handleFormSubmit(event) {
+    event.preventDefault();
+    console.log('Form submit handler called');
+    
+    // Save final step data
+    saveStepData(currentStep);
+    
+    // Show loading state
+    const submitButton = event.target.querySelector('button[type="submit"]');
+    if (!submitButton) {
+        console.error('Submit button not found');
+        return;
+    }
+    
+    const originalButtonText = submitButton.innerHTML;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+    submitButton.disabled = true;
+    
+    try {
+        // Map form data to match backend expectations
+        const reportData = mapFormDataToBackend(formData);
+        
+        console.log('Sending report data:', reportData);
+        
+        // Send data to backend using public endpoint
+        const response = await fetch('/api/submit_report', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Timestamp': new Date().toISOString()
+            },
+            credentials: 'include', // Include cookies for potential authentication
+            body: JSON.stringify(reportData)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            // Show success message
+            showSuccessMessage('تم إرسال التقرير بنجاح! شكراً لمساهمتك في تحسين سلامة الأدوية.');
+            
+            // Reset form after successful submission
+            event.target.reset();
+            currentStep = 1;
+            showStep(1);
+            Object.keys(formData).forEach(key => delete formData[key]);
+            
+        } else if (response.status === 401) {
+            // Handle authentication error
+            showErrorMessage('يجب تسجيل الدخول أولاً لإرسال التقرير.');
+            // Redirect to login page after a delay
+            setTimeout(() => {
+                window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+            }, 2000);
+            
+        } else {
+            // Handle other errors
+            showErrorMessage(result.error || 'حدث خطأ أثناء إرسال التقرير. يرجى المحاولة مرة أخرى.');
+        }
+        
+    } catch (error) {
+        console.error('Error submitting report:', error);
+        showErrorMessage('حدث خطأ في الاتصال. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.');
+    } finally {
+        // Restore button state
+        submitButton.innerHTML = originalButtonText;
+        submitButton.disabled = false;
+    }
+}
 
+function mapFormDataToBackend(formData) {
+    // Generate unique ID for the report
+    const reportId = 'ADR-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    
+    return {
+        id: reportId,
+        // Patient information
+        patient_age: formData.patient_age || '',
+        patient_gender: formData.patient_gender || '',
+        patient_weight: formData.patient_weight || '',
+        patient_height: formData.patient_height || '',
+        
+        // Drug information - map to backend expected field names
+        drug_name: formData.drug_name || '',
+        drug_manufacturer: formData.drug_manufacturer || '',
+        drug_batch_number: formData.drug_batch || '', // Map drug_batch to drug_batch_number
+        drug_dosage: formData.drug_dosage || '',
+        drug_route: formData.drug_route || '',
+        drug_indication: formData.drug_indication || '',
+        drug_start_date: formData.drug_start_date || '',
+        
+        // Reaction information
+        reaction_description: formData.reaction_description || '',
+        reaction_severity: formData.reaction_severity || '',
+        reaction_start_date: formData.reaction_start_date || '',
+        reaction_end_date: formData.reaction_end_date || '',
+        reaction_outcome: formData.outcome || '', // Map outcome to reaction_outcome
+        
+        // Reporter and location information
+        reporter_name: formData.reporter_name || '',
+        reporter_phone: formData.reporter_phone || '',
+        reporter_email: formData.reporter_email || '',
+        reporter_type: formData.reporter_type || '',
+        
+        // Location information
+        governorate: formData.governorate || '',
+        city: formData.city || '',
+        pharmacy_name: formData.pharmacy_name || '',
+        pharmacy_address: formData.pharmacy_address || '',
+        
+        // Additional fields
+        concomitant_drugs: formData.concomitant_drugs || '',
+        medical_history: formData.medical_history || '',
+        
+        // Default status and priority
+        status: 'pending',
+        priority: 'normal',
+        assigned_to: '',
+        follow_up_required: false,
+        
+        // Timestamp
+        report_date: new Date().toISOString()
+    };
+}
+
+function showSuccessMessage(message) {
+    // Create success notification
+    const notification = document.createElement('div');
+    notification.className = 'notification success-notification';
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-check-circle"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Add styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease-out;
+        max-width: 400px;
+        font-family: 'Noto Sans Arabic', sans-serif;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove notification after 5 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-in';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 5000);
+}
+
+function showErrorMessage(message) {
+    // Create error notification
+    const notification = document.createElement('div');
+    notification.className = 'notification error-notification';
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Add styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease-out;
+        max-width: 400px;
+        font-family: 'Noto Sans Arabic', sans-serif;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove notification after 7 seconds (longer for error messages)
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-in';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 7000);
+}
+
+function setupStepNavigation() {
+    // Navigation is handled by inline onclick attributes in HTML
+    // This function is kept for compatibility but doesn't add conflicting listeners
+    console.log('Step navigation setup completed - using inline onclick handlers');
+}
+
+function updateProgressBar() {
+    const progressLine = document.getElementById('progress-line');
+    const progressSteps = document.querySelectorAll('.progress-step');
+    
+    // Update progress line width
+    const progressPercentage = ((currentStep - 1) / (totalSteps - 1)) * 100;
+    if (progressLine) {
+        progressLine.style.width = progressPercentage + '%';
+    }
+    
+    // Update step indicators
+    progressSteps.forEach((step, index) => {
+        const stepNumber = index + 1;
+        step.classList.remove('active', 'completed');
+        
+        if (stepNumber < currentStep) {
+            step.classList.add('completed');
+            const circle = step.querySelector('.step-circle');
+            if (circle) circle.innerHTML = '<i class="fas fa-check"></i>';
+        } else if (stepNumber === currentStep) {
+            step.classList.add('active');
+            const circle = step.querySelector('.step-circle');
+            if (circle) circle.innerHTML = stepNumber;
+        } else {
+            const circle = step.querySelector('.step-circle');
+            if (circle) circle.innerHTML = stepNumber;
+        }
+    });
+}
+
+function showStep(stepNumber) {
+    console.log(`Highlighting step ${stepNumber}`);
+    
+    // Just remove active class from all steps
+    document.querySelectorAll('.form-step').forEach(step => {
+        step.classList.remove('active');
+    });
+    
+    // Add active class to current step - specifically target form-step elements
+    const stepElement = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
+    if (stepElement) {
+        stepElement.classList.add('active');
+        stepElement.scrollIntoView({ behavior: 'smooth' });
+        console.log(`Step ${stepNumber} element highlighted`);
+    }
+    
+    currentStep = stepNumber;
+    updateProgressBar();
+}
+
+function validateStep(stepNumber) {
+    const currentStepElement = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
+    if (!currentStepElement) return false;
+    
+    const requiredFields = currentStepElement.querySelectorAll('[required]');
+    let isValid = true;
+
+    requiredFields.forEach(field => {
+        const formGroup = field.closest('.form-group');
+        
+        if (!field.value || !field.value.trim()) {
+            if (formGroup) formGroup.classList.add('error');
+            isValid = false;
+        } else {
+            if (formGroup) formGroup.classList.remove('error');
+        }
+    });
+
+    // For step 1, only validate if age is provided (more lenient validation)
+    if (stepNumber === 1) {
+        const ageField = currentStepElement.querySelector('input[name="patient_age"]');
+        if (ageField && ageField.value && ageField.value.trim()) {
+            return true; // Allow progression if age is provided
+        }
+    }
+
+    // For step 4 (location and reporter), make reporter fields optional but validate if provided
+    if (stepNumber === 4) {
+        // Check if at least one reporter field is filled
+        const reporterName = currentStepElement.querySelector('input[name="reporter_name"]');
+        const reporterPhone = currentStepElement.querySelector('input[name="reporter_phone"]');
+        const reporterType = currentStepElement.querySelector('select[name="reporter_type"]');
+        
+        // If any reporter field is filled, validate basic requirements
+        if ((reporterName && reporterName.value.trim()) || 
+            (reporterPhone && reporterPhone.value.trim()) || 
+            (reporterType && reporterType.value.trim())) {
+            
+            // If reporter info is provided, require at least name and type
+            if (!reporterName.value.trim()) {
+                reporterName.closest('.form-group').classList.add('error');
+                isValid = false;
+            }
+            if (!reporterType.value.trim()) {
+                reporterType.closest('.form-group').classList.add('error');
+                isValid = false;
+            }
+        }
+        
+        // Always allow progression from step 4 even if reporter fields are empty
+        // This makes reporter information optional
+        return true;
+    }
+
+    return isValid;
+}
+
+function saveStepData(stepNumber) {
+    const currentStepElement = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
+    if (!currentStepElement) return;
+    
+    const inputs = currentStepElement.querySelectorAll('input, select, textarea');
+    
+    inputs.forEach(input => {
+        if (input.type === 'radio') {
+            if (input.checked) {
+                formData[input.name] = input.value;
+            }
+        } else {
+            formData[input.name] = input.value;
+        }
+    });
+}
+
+function nextStep() {
+    if (validateStep(currentStep)) {
+        saveStepData(currentStep);
+        
+        if (currentStep < totalSteps) {
+            if (currentStep === 4) {
+                generateSummary();
+            }
+            showStep(currentStep + 1);
+        }
+    }
+}
+
+function prevStep() {
+    if (currentStep > 1) {
+        showStep(currentStep - 1);
+    }
+}
+
+function generateSummary() {
+    const summaryContainer = document.getElementById('form-summary');
+    if (!summaryContainer) return;
+    
+    const sections = [
+        {
+            title: 'معلومات المريض',
+            icon: 'fas fa-user',
+            fields: [
+                { key: 'patient_age', label: 'العمر' },
+                { key: 'patient_gender', label: 'الجنس' },
+                { key: 'patient_weight', label: 'الوزن (كغ)' },
+                { key: 'patient_height', label: 'الطول (سم)' }
+            ]
+        },
+        {
+            title: 'معلومات الدواء',
+            icon: 'fas fa-pills',
+            fields: [
+                { key: 'drug_name', label: 'اسم الدواء' },
+                { key: 'drug_manufacturer', label: 'الشركة المصنعة' },
+                { key: 'drug_batch', label: 'رقم الدفعة' },
+                { key: 'drug_dosage', label: 'الجرعة' },
+                { key: 'drug_route', label: 'طريقة التناول' },
+                { key: 'drug_start_date', label: 'تاريخ البدء' }
+            ]
+        },
+        {
+            title: 'الأثر الجانبي',
+            icon: 'fas fa-exclamation-triangle',
+            fields: [
+                { key: 'reaction_description', label: 'وصف الأثر الجانبي' },
+                { key: 'reaction_severity', label: 'الشدة' },
+                { key: 'reaction_start_date', label: 'تاريخ البداية' },
+                { key: 'reaction_end_date', label: 'تاريخ الانتهاء' },
+                { key: 'outcome', label: 'النتيجة' }
+            ]
+        },
+        {
+            title: 'الموقع والمبلغ',
+            icon: 'fas fa-map-marker-alt',
+            fields: [
+                { key: 'governorate', label: 'المحافظة' },
+                { key: 'city', label: 'المدينة' },
+                { key: 'pharmacy_name', label: 'اسم الصيدلية' },
+                { key: 'pharmacy_address', label: 'عنوان الصيدلية' },
+                { key: 'reporter_name', label: 'اسم المبلغ' },
+                { key: 'reporter_type', label: 'نوع المبلغ' },
+                { key: 'reporter_phone', label: 'رقم الهاتف' },
+                { key: 'reporter_email', label: 'البريد الإلكتروني' }
+            ]
+        }
+    ];
+
+    let summaryHTML = '';
+    
+    sections.forEach(section => {
+        summaryHTML += `
+            <div class="summary-section">
+                <h3><i class="${section.icon}"></i> ${section.title}</h3>
+        `;
+        
+        section.fields.forEach(field => {
+            const value = formData[field.key] || 'غير محدد';
+            if (value && value !== 'غير محدد' && value.trim() !== '') {
+                summaryHTML += `
+                    <div class="summary-item">
+                        <span class="summary-label">${field.label}:</span>
+                        <span class="summary-value">${value}</span>
+                    </div>
+                `;
+            }
+        });
+        
+        summaryHTML += '</div>';
+    });
+    
+    summaryContainer.innerHTML = summaryHTML;
+}
+
+function setupRealTimeValidation() {
+    // Add input event listeners for real-time validation
+    document.addEventListener('input', function(e) {
+        if (e.target.matches('input[required], select[required], textarea[required]')) {
+            const formGroup = e.target.closest('.form-group');
+            if (e.target.value.trim()) {
+                if (formGroup) formGroup.classList.remove('error');
+            }
+        }
+    });
+}
+
+// Make functions globally available
+window.nextStep = nextStep;
+window.prevStep = prevStep;
+window.generateSummary = generateSummary;
+window.validateStep = validateStep;
+window.saveStepData = saveStepData;
+window.showStep = showStep;

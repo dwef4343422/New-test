@@ -7,107 +7,99 @@ class AuthManager {
         this.init();
     }
 
-    /**
-     * Initializes the authentication manager by checking the current
-     * session status and setting up UI event listeners.
-     */
     async init() {
         await this.checkAuthStatus();
         this.setupAuthUI();
     }
 
-    /**
-     * Checks the user's current authentication status with the backend.
-     * This uses the cleaner fetch logic from the "fix" file.
-     */
     async checkAuthStatus() {
         try {
-            const res = await fetch('/auth/me', { credentials: 'include' });
-            if (res.ok) {
-                const data = await res.json();
-                this.currentUser = data.user;
-                this.isAuthenticated = true;
-            } else {
-                this.currentUser = null;
-                this.isAuthenticated = false;
-            }
-        } catch (err) {
-            console.warn("Session check failed, user is not authenticated.", err);
-            this.currentUser = null;
-            this.isAuthenticated = false;
-        } finally {
-            this.updateAuthUI();
-        }
-    }
-
-    /**
-     * Attempts to log in a user with the provided credentials.
-     * @param {string} username - The user's username.
-     * @param {string} password - The user's password.
-     * @param {boolean} remember - Whether to create a persistent session.
-     * @returns {Promise<object>} An object with success status and a message.
-     */
-    async login(username, password, remember = false) {
-        try {
-            const res = await fetch('/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ username, password, remember })
+            const response = await fetch('/auth/me', {
+                credentials: 'include'
             });
-
-            const data = await res.json();
-            if (res.ok) {
+            
+            if (response.ok) {
+                const data = await response.json();
                 this.currentUser = data.user;
                 this.isAuthenticated = true;
                 this.updateAuthUI();
-                return { success: true, message: data.message };
+                return true;
             } else {
-                return { success: false, message: data.message || 'فشل تسجيل الدخول' };
+                this.currentUser = null;
+                this.isAuthenticated = false;
+                this.updateAuthUI();
+                return false;
             }
-        } catch (err) {
-            console.error('Login error:', err);
-            return { success: false, message: 'فشل الاتصال بالخادم' };
+        } catch (error) {
+            console.error('Auth check error:', error);
+            this.currentUser = null;
+            this.isAuthenticated = false;
+            this.updateAuthUI();
+            return false;
         }
     }
 
-    /**
-     * Logs the current user out.
-     * @returns {Promise<object>} An object with success status and a message.
-     */
+    async login(username, password, remember = false) {
+        try {
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    username,
+                    password,
+                    remember
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                this.currentUser = result.user;
+                this.isAuthenticated = true;
+                this.updateAuthUI();
+                return { success: true, message: result.message };
+            } else {
+                return { success: false, message: result.message };
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            return { success: false, message: 'حدث خطأ في الاتصال' };
+        }
+    }
+
     async logout() {
         try {
-            const res = await fetch('/auth/logout', {
+            const response = await fetch('/auth/logout', {
                 method: 'POST',
                 credentials: 'include'
             });
 
-            const data = await res.json();
-            if (res.ok) {
+            const result = await response.json();
+
+            if (response.ok) {
                 this.currentUser = null;
                 this.isAuthenticated = false;
                 this.updateAuthUI();
-                return { success: true, message: data.message };
+                return { success: true, message: result.message };
             } else {
-                return { success: false, message: data.message || 'فشل تسجيل الخروج' };
+                return { success: false, message: result.message };
             }
-        } catch (err) {
-            console.error('Logout error:', err);
-            return { success: false, message: 'فشل الاتصال بالخادم' };
+        } catch (error) {
+            console.error('Logout error:', error);
+            return { success: false, message: 'حدث خطأ في الاتصال' };
         }
     }
 
-    /**
-     * Changes the current user's password.
-     * @param {string} currentPassword - The user's current password.
-     * @param {string} newPassword - The desired new password.
-     * @returns {Promise<object>} An object with success status and a message.
-     */
     async changePassword(currentPassword, newPassword) {
         try {
             const response = await fetch('/auth/change-password', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 credentials: 'include',
                 body: JSON.stringify({
                     current_password: currentPassword,
@@ -126,24 +118,23 @@ class AuthManager {
         }
     }
 
-    /**
-     * Checks if the current user has at least a specific role.
-     * @param {string} role - The role to check for ('viewer', 'reviewer', 'admin').
-     * @returns {boolean} True if the user has the required role or higher.
-     */
     hasRole(role) {
         if (!this.isAuthenticated || !this.currentUser) {
             return false;
         }
-        const roles = { 'viewer': 1, 'reviewer': 2, 'admin': 3 };
+
+        const roles = {
+            'viewer': 1,
+            'reviewer': 2,
+            'admin': 3
+        };
+
         const userLevel = roles[this.currentUser.role] || 0;
         const requiredLevel = roles[role] || 0;
+
         return userLevel >= requiredLevel;
     }
 
-    /**
-     * Redirects to the login page if the user is not authenticated.
-     */
     requireAuth() {
         if (!this.isAuthenticated) {
             window.location.href = '/login';
@@ -152,39 +143,38 @@ class AuthManager {
         return true;
     }
 
-    /**
-     * Checks for a specific role and shows an error if permissions are insufficient.
-     */
     requireRole(role) {
-        if (!this.requireAuth()) return false;
+        if (!this.requireAuth()) {
+            return false;
+        }
+
         if (!this.hasRole(role)) {
             this.showError('ليس لديك صلاحية للوصول إلى هذه الصفحة');
             return false;
         }
+
         return true;
     }
 
-    /**
-     * Sets up event listeners for UI elements like logout buttons.
-     */
     setupAuthUI() {
-        document.querySelectorAll('.logout-btn').forEach(btn => {
+        // Setup logout buttons
+        const logoutButtons = document.querySelectorAll('.logout-btn');
+        logoutButtons.forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 const result = await this.logout();
                 if (result.success) {
-                    // Redirect to home page or login page after logout
                     window.location.href = '/';
                 } else {
                     this.showError(result.message);
                 }
             });
         });
+
+        // Setup role-based visibility
+        this.updateRoleBasedUI();
     }
 
-    /**
-     * Main function to update all authentication-related UI elements.
-     */
     updateAuthUI() {
         // Update user info displays
         const userNameElements = document.querySelectorAll('.user-name');
@@ -198,31 +188,34 @@ class AuthManager {
             el.textContent = this.currentUser ? this.getRoleDisplayName(this.currentUser.role) : '';
         });
 
+        // Update navigation
         this.updateNavigation();
+        
+        // Update role-based UI
         this.updateRoleBasedUI();
     }
 
-    /**
-     * Shows or hides navigation links based on authentication status.
-     */
     updateNavigation() {
-        document.querySelectorAll('.auth-required').forEach(el => {
-            el.style.display = this.isAuthenticated ? 'block' : 'none';
+        const authLinks = document.querySelectorAll('.auth-required');
+        const guestLinks = document.querySelectorAll('.guest-only');
+
+        authLinks.forEach(link => {
+            link.style.display = this.isAuthenticated ? 'block' : 'none';
         });
 
-        document.querySelectorAll('.guest-only').forEach(el => {
-            el.style.display = this.isAuthenticated ? 'none' : 'block';
+        guestLinks.forEach(link => {
+            link.style.display = this.isAuthenticated ? 'none' : 'block';
         });
     }
 
-    /**
-     * Shows or hides elements based on the required role specified
-     * in the `data-role` attribute.
-     */
     updateRoleBasedUI() {
-        document.querySelectorAll('[data-role]').forEach(element => {
+        const roleElements = document.querySelectorAll('[data-role]');
+        
+        roleElements.forEach(element => {
             const requiredRole = element.getAttribute('data-role');
-            if (this.hasRole(requiredRole)) {
+            const hasPermission = this.hasRole(requiredRole);
+            
+            if (hasPermission) {
                 element.style.display = '';
                 element.classList.remove('hidden');
             } else {
@@ -232,63 +225,95 @@ class AuthManager {
         });
     }
 
-    /**
-     * Gets the display name for a given role key.
-     * @param {string} role - The role key (e.g., 'admin').
-     * @returns {string} The display name (e.g., 'مدير').
-     */
     getRoleDisplayName(role) {
-        const roleNames = { 'admin': 'مدير', 'reviewer': 'مراجع', 'viewer': 'مشاهد' };
+        const roleNames = {
+            'admin': 'مدير',
+            'reviewer': 'مراجع',
+            'viewer': 'مشاهد'
+        };
         return roleNames[role] || role;
     }
 
-    /**
-     * Displays a styled error message on the screen.
-     * @param {string} message - The error message to display.
-     */
     showError(message) {
-        this.showAlert(message, 'error');
-    }
-
-    /**
-     * Displays a styled success message on the screen.
-     * @param {string} message - The success message to display.
-     */
-    showSuccess(message) {
-        this.showAlert(message, 'success');
-    }
-
-    /**
-     * Helper function to create and show styled alerts.
-     * @param {string} message - The message to display.
-     * @param {string} type - 'success' or 'error'.
-     */
-    showAlert(message, type = 'error') {
-        let alertContainer = document.getElementById('auth-alert-container');
+        // Create or update error alert
+        let alertContainer = document.getElementById('auth-alert');
         if (!alertContainer) {
             alertContainer = document.createElement('div');
-            alertContainer.id = 'auth-alert-container';
-            alertContainer.style.cssText = `position: fixed; top: 20px; right: 20px; z-index: 10000; max-width: 400px;`;
+            alertContainer.id = 'auth-alert';
+            alertContainer.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                max-width: 400px;
+            `;
             document.body.appendChild(alertContainer);
         }
 
-        const alert = document.createElement('div');
-        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
-        const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
-        
-        alert.className = `alert ${alertClass}`;
-        alert.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+        alertContainer.innerHTML = `
+            <div class="alert alert-error" style="
+                background-color: #fff5f5;
+                color: #e53e3e;
+                border: 1px solid #fed7d7;
+                padding: 1rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            ">
+                <i class="fas fa-exclamation-triangle" style="margin-left: 0.5rem;"></i>
+                ${message}
+            </div>
+        `;
 
-        alertContainer.appendChild(alert);
-
+        // Auto-hide after 5 seconds
         setTimeout(() => {
-            alert.style.opacity = '0';
-            setTimeout(() => alert.remove(), 300);
+            if (alertContainer) {
+                alertContainer.innerHTML = '';
+            }
         }, 5000);
+    }
+
+    showSuccess(message) {
+        // Create or update success alert
+        let alertContainer = document.getElementById('auth-alert');
+        if (!alertContainer) {
+            alertContainer = document.createElement('div');
+            alertContainer.id = 'auth-alert';
+            alertContainer.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                max-width: 400px;
+            `;
+            document.body.appendChild(alertContainer);
+        }
+
+        alertContainer.innerHTML = `
+            <div class="alert alert-success" style="
+                background-color: #f0fff4;
+                color: #38a169;
+                border: 1px solid #9ae6b4;
+                padding: 1rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            ">
+                <i class="fas fa-check-circle" style="margin-left: 0.5rem;"></i>
+                ${message}
+            </div>
+        `;
+
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+            if (alertContainer) {
+                alertContainer.innerHTML = '';
+            }
+        }, 3000);
     }
 }
 
-// Create a global instance of the AuthManager for easy access across the application.
+// Create global auth manager instance
 const authManager = new AuthManager();
+
+// Export for use in other modules
 window.authManager = authManager;
 

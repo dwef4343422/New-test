@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الأسئلة الشائعة - منصة اليقظة الدوائية العراقية</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <style>
+        .faq-hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            padding: 120px 0 80px;
+            margin-top: 70px;
+            text-align: center;
+        }
+
+        .search-section {
+            background-color: var(--background-white);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        .category-filters {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .category-filter {
+            padding: 0.5rem 1rem;
+            background-color: var(--background-light);
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .category-filter.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .category-filter:hover {
+            border-color: var(--primary-color);
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background-color: var(--background-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .faq-item:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--background-white);
+            border: none;
+            width: 100%;
+            text-align: right;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .faq-question:hover {
+            background-color: var(--background-light);
+        }
+
+        .faq-question.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .faq-icon {
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .faq-question.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background-color: var(--background-light);
+        }
+
+        .faq-answer.active {
+            padding: 1.5rem;
+            max-height: 500px;
+        }
+
+        .faq-answer-content {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--border-color);
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .contact-section {
+            background-color: var(--background-white);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .contact-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .contact-section p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .search-input {
+                font-size: 1rem;
+                padding: 0.75rem 2.5rem 0.75rem 0.75rem;
+            }
+
+            .category-filters {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+
+            .category-filter {
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            .faq-question {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+
+            .faq-answer.active {
+                padding: 1rem;
+            }
+
+            .contact-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>اليقظة الدوائية العراقية</span>
+            </div>
+            <div class="nav-menu" id="nav-menu">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="info.html" class="nav-link">معلومات توعوية</a>
+                <a href="report.html" class="nav-link">الإبلاغ</a>
+                <a href="faq.html" class="nav-link active">الأسئلة الشائعة</a>
+                <a href="dashboard.html" class="nav-link">لوحة التحكم</a>
+            </div>
+            <div class="nav-toggle" id="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="faq-hero">
+        <div class="container">
+            <h1>الأسئلة الشائعة</h1>
+            <p>اعثر على إجابات للأسئلة الأكثر شيوعاً حول اليقظة الدوائية</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main style="padding: 2rem 0;">
+        <div class="container">
+            <!-- Search Section -->
+            <div class="search-section">
+                <div class="search-box">
+                    <input type="text" class="search-input" id="faq-search" placeholder="ابحث في الأسئلة الشائعة...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <div class="category-filters" id="category-filters">
+                    <button class="category-filter active" data-category="all">جميع الأسئلة</button>
+                    <!-- Categories will be loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- FAQ Container -->
+            <div class="faq-container">
+                <div id="faq-content">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>جاري تحميل الأسئلة الشائعة...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="contact-section">
+                <h3>لم تجد إجابة لسؤالك؟</h3>
+                <p>تواصل معنا وسنكون سعداء لمساعدتك</p>
+                <div class="contact-buttons">
+                    <a href="report.html" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i>
+                        إرسال تقرير
+                    </a>
+                    <a href="mailto:info@pharmacovigilance.iq" class="btn btn-secondary">
+                        <i class="fas fa-envelope"></i>
+                        راسلنا
+                    </a>
+                    <a href="tel:+96412345678" class="btn btn-outline">
+                        <i class="fas fa-phone"></i>
+                        اتصل بنا
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>منصة اليقظة الدوائية العراقية</h3>
+                    <p>نظام وطني لتعزيز سلامة الأدوية وحماية المواطنين من خلال الإبلاغ عن الآثار الجانبية والمراقبة المستمرة.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="index.html">الرئيسية</a></li>
+                        <li><a href="report.html">الإبلاغ</a></li>
+                        <li><a href="info.html">معلومات توعوية</a></li>
+                        <li><a href="faq.html">الأسئلة الشائعة</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>تواصل معنا</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-phone"></i> +964 1 234 5678</p>
+                        <p><i class="fas fa-envelope"></i> info@pharmacovigilance.iq</p>
+                        <p><i class="fas fa-map-marker-alt"></i> بغداد، العراق</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 وزارة الصحة العراقية - جميع الحقوق محفوظة</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/faq.js"></script>
+</body>
+</html>
+

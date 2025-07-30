@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost:* https://*;">
+    <title>الإبلاغ - منصة اليقظة الدوائية العراقية</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <style>
+        /* Multi-step form styles */
+        .multi-step-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .progress-container {
+            margin-bottom: 3rem;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: #e5e7eb;
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            z-index: 2;
+            transform: translateY(-50%);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 3;
+            background-color: white;
+            padding: 0.5rem;
+        }
+
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-step.active .step-circle {
+            background-color: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .progress-step.completed .step-circle {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #6b7280;
+            text-align: center;
+            max-width: 100px;
+        }
+
+        .progress-step.active .step-label {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .form-step {
+            display: none !important;
+            animation: fadeInSlide 0.4s ease-out;
+        }
+
+        .form-step.active {
+            display: block !important;
+        }
+
+        @keyframes fadeInSlide {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .step-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(44, 90, 160, 0.2);
+        }
+
+        .step-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .step-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .required {
+            color: #e74c3c;
+            margin-right: 0.25rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: white;
+            font-family: 'Noto Sans Arabic', sans-serif;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(44, 90, 160, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .severity-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .severity-option {
+            position: relative;
+        }
+
+        .severity-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .severity-option label {
+            display: block;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            background-color: white;
+        }
+
+        .severity-option input[type="radio"]:checked + label {
+            border-color: var(--primary-color);
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(44, 90, 160, 0.3);
+        }
+
+        .step-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3rem;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-family: 'Noto Sans Arabic', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            box-shadow: 0 5px 15px rgba(44, 90, 160, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(44, 90, 160, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #6b7280;
+            border: 2px solid #e5e7eb;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+            transform: translateY(-2px);
+        }
+
+        .summary-section {
+            background-color: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .summary-value {
+            color: #2d3748;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .form-group.error .form-input,
+        .form-group.error .form-select,
+        .form-group.error .form-textarea {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.1);
+        }
+
+        .form-group.error .error-message {
+            display: block;
+        }
+
+        .emergency-notice {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            border: 2px solid #f87171;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            color: #991b1b;
+        }
+
+        .emergency-notice h4 {
+            color: #991b1b;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+        }
+
+        /* Notification animations */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .notification-content i {
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .multi-step-container {
+                padding: 1rem;
+            }
+
+            .progress-bar {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .step-circle {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .step-label {
+                font-size: 0.8rem;
+                max-width: 80px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .step-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .step-header p {
+                font-size: 1rem;
+            }
+
+            .severity-options {
+                grid-template-columns: 1fr;
+            }
+
+            .step-navigation {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>اليقظة الدوائية العراقية</span>
+            </div>
+            <div class="nav-menu" id="nav-menu">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="info.html" class="nav-link">معلومات توعوية</a>
+                <a href="report.html" class="nav-link active">الإبلاغ</a>
+                <a href="faq.html" class="nav-link">الأسئلة الشائعة</a>
+                <a href="dashboard.html" class="nav-link auth-required" style="display: none;">لوحة التحكم</a>
+                <a href="login.html" class="nav-link guest-only">تسجيل الدخول</a>
+            </div>
+            <div class="nav-toggle" id="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main style="margin-top: 70px;">
+        <div class="multi-step-container">
+            <div class="text-center mb-4">
+                <h1>نظام الإبلاغ التفاعلي</h1>
+                <p>ساهم في تحسين سلامة الأدوية من خلال الإبلاغ عن الآثار الجانبية</p>
+            </div>
+
+            <!-- Emergency Notice -->
+            <div class="emergency-notice">
+                <h4><i class="fas fa-exclamation-triangle"></i> تنبيه مهم</h4>
+                <p>في حالة الطوارئ الطبية، يرجى الاتصال بأقرب مستشفى أو الرقم 115 فوراً. هذا النظام مخصص للإبلاغ عن الآثار الجانبية وليس للطوارئ الطبية.</p>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-line" id="progress-line"></div>
+                    <div class="progress-step active" data-step="1">
+                        <div class="step-circle">1</div>
+                        <div class="step-label">معلومات المريض</div>
+                    </div>
+                    <div class="progress-step" data-step="2">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">معلومات الدواء</div>
+                    </div>
+                    <div class="progress-step" data-step="3">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">الأثر الجانبي</div>
+                    </div>
+                    <div class="progress-step" data-step="4">
+                        <div class="step-circle">4</div>
+                        <div class="step-label">الموقع والمبلغ</div>
+                    </div>
+                    <div class="progress-step" data-step="5">
+                        <div class="step-circle">5</div>
+                        <div class="step-label">المراجعة والإرسال</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Multi-Step Form -->
+            <form id="pharmacovigilance-form" class="multi-step-form">
+                <!-- Step 1: Patient Information -->
+                <div class="form-step active" data-step="1">
+                    <div class="step-header">
+                        <h2><i class="fas fa-user"></i> معلومات المريض</h2>
+                        <p>يرجى تقديم معلومات أساسية عن المريض</p>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">العمر <span class="required">*</span></label>
+                            <input type="number" class="form-input" name="patient_age" min="0" max="120" required>
+                            <div class="error-message">يرجى إدخال عمر صحيح</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">الجنس <span class="required">*</span></label>
+                            <select class="form-select" name="patient_gender" required>
+                                <option value="">اختر الجنس</option>
+                                <option value="ذكر">ذكر</option>
+                                <option value="أنثى">أنثى</option>
+                                <option value="غير محدد">غير محدد</option>
+                            </select>
+                            <div class="error-message">يرجى اختيار الجنس</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">الوزن (كيلوغرام)</label>
+                            <input type="number" class="form-input" name="patient_weight" min="0" step="0.1" placeholder="مثال: 70">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">الطول (سم)</label>
+                            <input type="number" class="form-input" name="patient_height" min="0" step="0.1" placeholder="مثال: 170">
+                        </div>
+                    </div>
+                    
+                    <div class="step-navigation">
+                        <div></div>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">
+                            التالي <i class="fas fa-arrow-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Drug Information -->
+                <div class="form-step" data-step="2">
+                    <div class="step-header">
+                        <h2><i class="fas fa-pills"></i> معلومات الدواء</h2>
+                        <p>يرجى تقديم معلومات عن الدواء الذي تسبب في الأعراض</p>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="form-label">اسم الدواء <span class="required">*</span></label>
+                            <input type="text" class="form-input" name="drug_name" required placeholder="مثال: بروفين، بانادول، أسبرين...">
+                            <div class="error-message">يرجى إدخال اسم الدواء</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">الشركة المصنعة</label>
+                            <input type="text" class="form-input" name="drug_manufacturer" placeholder="مثال: فايزر، نوفارتس...">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">رقم الدفعة</label>
+                            <input type="text" class="form-input" name="drug_batch" placeholder="رقم الدفعة المكتوب على العبوة">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">الجرعة</label>
+                            <input type="text" class="form-input" name="drug_dosage" placeholder="مثال: 500 ملغ، 10 مل">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">طريقة التناول</label>
+                            <select class="form-select" name="drug_route">
+                                <option value="">اختر الطريقة</option>
+                                <option value="فموي">فموي (بالفم)</option>
+                                <option value="حقن">حقن</option>
+                                <option value="موضعي">موضعي (على الجلد)</option>
+                                <option value="استنشاق">استنشاق</option>
+                                <option value="أخرى">أخرى</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">تاريخ البدء في تناول الدواء</label>
+                            <input type="date" class="form-input" name="drug_start_date">
+                        </div>
+                    </div>
+                    
+                    <div class="step-navigation">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                            <i class="fas fa-arrow-right"></i> السابق
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">
+                            التالي <i class="fas fa-arrow-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Adverse Reaction -->
+                <div class="form-step" data-step="3">
+                    <div class="step-header">
+                        <h2><i class="fas fa-exclamation-triangle"></i> الأثر الجانبي</h2>
+                        <p>يرجى وصف الأعراض التي ظهرت بعد تناول الدواء</p>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="form-label">وصف الأثر الجانبي <span class="required">*</span></label>
+                            <textarea class="form-textarea" name="reaction_description" required placeholder="اكتب وصفاً مفصلاً للأعراض التي ظهرت (مثل: طفح جلدي، غثيان، دوخة، صداع...)"></textarea>
+                            <div class="error-message">يرجى وصف الأعراض التي ظهرت</div>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label class="form-label">شدة الأثر الجانبي</label>
+                            <div class="severity-options">
+                                <div class="severity-option">
+                                    <input type="radio" id="mild" name="reaction_severity" value="خفيف">
+                                    <label for="mild">خفيف</label>
+                                </div>
+                                <div class="severity-option">
+                                    <input type="radio" id="moderate" name="reaction_severity" value="متوسط">
+                                    <label for="moderate">متوسط</label>
+                                </div>
+                                <div class="severity-option">
+                                    <input type="radio" id="severe" name="reaction_severity" value="شديد">
+                                    <label for="severe">شديد</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">تاريخ بداية الأعراض</label>
+                            <input type="date" class="form-input" name="reaction_start_date">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">تاريخ انتهاء الأعراض</label>
+                            <input type="date" class="form-input" name="reaction_end_date">
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label class="form-label">النتيجة</label>
+                            <select class="form-select" name="outcome">
+                                <option value="">اختر النتيجة</option>
+                                <option value="تعافى تماماً">تعافى تماماً</option>
+                                <option value="في طور التعافي">في طور التعافي</option>
+                                <option value="لم يتعافى">لم يتعافى</option>
+                                <option value="غير معروف">غير معروف</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="step-navigation">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                            <i class="fas fa-arrow-right"></i> السابق
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">
+                            التالي <i class="fas fa-arrow-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Location and Reporter -->
+                <div class="form-step" data-step="4">
+                    <div class="step-header">
+                        <h2><i class="fas fa-map-marker-alt"></i> الموقع ومعلومات المبلغ</h2>
+                        <p>يرجى تقديم معلومات الموقع ومعلومات الاتصال</p>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">المحافظة</label>
+                            <select class="form-select" name="governorate">
+                                <option value="">اختر المحافظة</option>
+                                <option value="بغداد">بغداد</option>
+                                <option value="البصرة">البصرة</option>
+                                <option value="نينوى">نينوى</option>
+                                <option value="أربيل">أربيل</option>
+                                <option value="النجف">النجف</option>
+                                <option value="كربلاء">كربلاء</option>
+                                <option value="بابل">بابل</option>
+                                <option value="الأنبار">الأنبار</option>
+                                <option value="ديالى">ديالى</option>
+                                <option value="كركوك">كركوك</option>
+                                <option value="واسط">واسط</option>
+                                <option value="صلاح الدين">صلاح الدين</option>
+                                <option value="القادسية">القادسية</option>
+                                <option value="المثنى">المثنى</option>
+                                <option value="ذي قار">ذي قار</option>
+                                <option value="ميسان">ميسان</option>
+                                <option value="دهوك">دهوك</option>
+                                <option value="السليمانية">السليمانية</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">المدينة</label>
+                            <input type="text" class="form-input" name="city" placeholder="اسم المدينة أو المنطقة">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">اسم الصيدلية</label>
+                            <input type="text" class="form-input" name="pharmacy_name" placeholder="اسم الصيدلية التي تم شراء الدواء منها">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">عنوان الصيدلية</label>
+                            <input type="text" class="form-input" name="pharmacy_address" placeholder="عنوان الصيدلية">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">اسم المبلغ</label>
+                            <input type="text" class="form-input" name="reporter_name" placeholder="الاسم الكامل">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">نوع المبلغ</label>
+                            <select class="form-select" name="reporter_type">
+                                <option value="">اختر نوع المبلغ</option>
+                                <option value="مريض">مريض</option>
+                                <option value="طبيب">طبيب</option>
+                                <option value="صيدلي">صيدلي</option>
+                                <option value="ممرض">ممرض</option>
+                                <option value="أهل المريض">أهل المريض</option>
+                                <option value="أخرى">أخرى</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">رقم الهاتف</label>
+                            <input type="tel" class="form-input" name="reporter_phone" placeholder="07xxxxxxxxx">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">البريد الإلكتروني</label>
+                            <input type="email" class="form-input" name="reporter_email" placeholder="example@email.com">
+                        </div>
+                    </div>
+                    
+                    <div class="step-navigation">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                            <i class="fas fa-arrow-right"></i> السابق
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">
+                            التالي <i class="fas fa-arrow-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 5: Review and Submit -->
+                <div class="form-step" data-step="5">
+                    <div class="step-header">
+                        <h2><i class="fas fa-check-circle"></i> مراجعة البيانات والإرسال</h2>
+                        <p>يرجى مراجعة البيانات المدخلة قبل الإرسال</p>
+                    </div>
+                    
+                    <div id="form-summary">
+                        <!-- Summary will be populated by JavaScript -->
+                    </div>
+                    
+                    <div class="step-navigation">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                            <i class="fas fa-arrow-right"></i> السابق
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> إرسال التقرير
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>منصة اليقظة الدوائية العراقية</h3>
+                    <p>نظام وطني لتعزيز سلامة الأدوية وحماية المواطنين من خلال الإبلاغ عن الآثار الجانبية والمراقبة المستمرة.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="index.html">الرئيسية</a></li>
+                        <li><a href="report.html">الإبلاغ</a></li>
+                        <li><a href="info.html">معلومات توعوية</a></li>
+                        <li><a href="faq.html">الأسئلة الشائعة</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>تواصل معنا</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-phone"></i> +964 1 234 5678</p>
+                        <p><i class="fas fa-envelope"></i> info@pharmacovigilance.iq</p>
+                        <p><i class="fas fa-map-marker-alt"></i> بغداد، العراق</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 وزارة الصحة العراقية - جميع الحقوق محفوظة</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="js/app-config.js"></script>
+    <script src="js/error-handler.js"></script>
+    <script src="js/date-formatter.js"></script>
+    <script src="js/form-handler.js"></script>
+    <script src="js/navigation-manager.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/report.js"></script>
+</body>
+</html>

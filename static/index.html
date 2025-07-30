@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة اليقظة الدوائية العراقية</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <style>
+        /* Additional styles for the new sections */
+        .modern-section {
+            padding: 60px 0;
+            margin: 2rem 0;
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .gradient-blue {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+        }
+        
+        .gradient-purple {
+            background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+            color: white;
+        }
+        
+        .big-report-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--success-color) 0%, #14b8a6 100%);
+            color: white;
+            padding: 2rem 3rem;
+            border-radius: 50px;
+            font-size: 2rem;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+            border: 4px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .big-report-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+        }
+        
+        .video-section {
+            padding: 60px 0;
+            background-color: var(--background-white);
+            border-radius: 15px;
+            margin: 2rem 0;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+        
+        .enhanced-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .enhanced-stat-card {
+            background-color: var(--background-white);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            border-bottom: 4px solid var(--primary-color);
+        }
+        
+        .enhanced-stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .enhanced-stat-card:nth-child(2) {
+            border-bottom-color: var(--success-color);
+        }
+        
+        .enhanced-stat-card:nth-child(3) {
+            border-bottom-color: #7c3aed;
+        }
+        
+        .enhanced-stat-card:nth-child(4) {
+            border-bottom-color: var(--warning-color);
+        }
+        
+        .enhanced-stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        
+        .enhanced-stat-card:nth-child(1) .enhanced-stat-number {
+            color: var(--primary-color);
+        }
+        
+        .enhanced-stat-card:nth-child(2) .enhanced-stat-number {
+            color: var(--success-color);
+        }
+        
+        .enhanced-stat-card:nth-child(3) .enhanced-stat-number {
+            color: #7c3aed;
+        }
+        
+        .enhanced-stat-card:nth-child(4) .enhanced-stat-number {
+            color: var(--warning-color);
+        }
+        
+        .enhanced-services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .enhanced-service-card {
+            background-color: var(--background-white);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+        }
+        
+        .enhanced-service-card:hover {
+            transform: scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .enhanced-service-card:first-child {
+            border: 2px solid var(--primary-color);
+        }
+        
+        .service-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .enhanced-service-card:first-child .service-icon {
+            color: var(--primary-color);
+        }
+        
+        .service-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .enhanced-service-card:first-child .service-title {
+            color: var(--primary-color);
+        }
+        
+        .service-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .service-btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .enhanced-service-card:first-child .service-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .enhanced-service-card:first-child .service-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .enhanced-service-card:not(:first-child) .service-btn {
+            background-color: var(--text-secondary);
+            color: white;
+        }
+        
+        .enhanced-service-card:not(:first-child) .service-btn:hover {
+            background-color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+        
+        .alerts-placeholder {
+            background-color: var(--background-light);
+            padding: 3rem;
+            border-radius: 15px;
+            text-align: center;
+            border-top: 4px solid var(--danger-color);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .modern-footer {
+            background-color: var(--text-primary);
+            color: white;
+            padding: 3rem 0 1rem;
+            border-radius: 15px 15px 0 0;
+            margin: 2rem 0 0 0;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section h4 {
+            color: #60a5fa;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .footer-section p,
+        .footer-section li {
+            color: #d1d5db;
+            line-height: 1.6;
+        }
+        
+        .footer-section a {
+            color: #d1d5db;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer-section a:hover {
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .big-report-button {
+                font-size: 1.5rem;
+                padding: 1.5rem 2rem;
+            }
+            
+            .enhanced-stat-number {
+                font-size: 2.5rem;
+            }
+            
+            .service-icon {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>اليقظة الدوائية العراقية</span>
+            </div>
+            <div class="nav-menu" id="nav-menu">
+                <a href="index.html" class="nav-link active">الرئيسية</a>
+                <a href="info.html" class="nav-link">معلومات توعوية</a>
+                <a href="report.html" class="nav-link">الإبلاغ</a>
+                <a href="faq.html" class="nav-link">الأسئلة الشائعة</a>
+                <a href="dashboard.html" class="nav-link auth-required" style="display: none;">لوحة التحكم</a>
+                <a href="login.html" class="nav-link guest-only">تسجيل الدخول</a>
+            </div>
+            <div class="nav-toggle" id="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- What is Pharmacovigilance Section -->
+    <section class="modern-section gradient-blue">
+        <div class="container">
+            <div class="text-center">
+                <h2 style="font-size: 3rem; margin-bottom: 1.5rem; font-weight: 800;">
+                    ما هي اليقظة الدوائية؟
+                </h2>
+                <p style="font-size: 1.25rem; opacity: 0.95; line-height: 1.7; max-width: 800px; margin: 0 auto;">
+                    اليقظة الدوائية هي <strong>علم وأنشطة تتعلق بالكشف والتقييم والفهم والوقاية من الآثار الجانبية للأدوية</strong> أو أي مشكلة أخرى تتعلق بالدواء بعد طرحه في الأسواق. هدفها الرئيسي هو ضمان سلامة المرضى وتعزيز الصحة العامة.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Section -->
+    <section class="video-section">
+        <div class="container">
+            <h3 class="section-title" style="font-size: 2.5rem; margin-bottom: 2rem;">شاهد المزيد عن اليقظة الدوائية</h3>
+            <div class="video-container">
+                <video controls loop muted>
+                    <source src="IMG_8602.MP4" type="video/mp4">
+                    متصفحك لا يدعم تشغيل الفيديو.
+                </video>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Pharmacovigilance Section -->
+    <section class="modern-section gradient-purple">
+        <div class="container">
+            <div class="text-center">
+                <h2 style="font-size: 3rem; margin-bottom: 1.5rem; font-weight: 800;">
+                    لماذا اليقظة الدوائية؟
+                </h2>
+                <p style="font-size: 1.25rem; opacity: 0.95; line-height: 1.7; max-width: 800px; margin: 0 auto;">
+                    تلعب اليقظة الدوائية دوراً حيوياً في <strong>حماية صحة المجتمع</strong> من خلال المراقبة المستمرة للأدوية.
+                    مساهمتك في الإبلاغ عن أي آثار غير مرغوبة <strong>تحمي الأرواح</strong> وتساعد في بناء سجل دوائي آمن للجميع، مما يضمن أقصى استفادة وأقل ضرر من العلاجات.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Big Report Button Section -->
+    <section style="padding: 60px 0; text-align: center;">
+        <div class="container">
+            <a href="report.html" class="big-report-button">
+                <i class="fas fa-file-alt" style="margin-left: 1rem;"></i> أبلغ عن آثار جانبية الآن!
+            </a>
+            <p style="color: var(--text-secondary); font-size: 1.125rem; margin-top: 1.5rem;">مساهمتك تحدث فرقاً في سلامة مجتمعنا.</p>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="modern-section" style="background-color: var(--background-white);">
+        <div class="container">
+            <h3 class="section-title" style="font-size: 2.5rem;">إحصائيات المنصة</h3>
+            <div class="enhanced-stats-grid">
+                <div class="enhanced-stat-card">
+                    <div class="enhanced-stat-number" id="total-reports">0</div>
+                    <p style="color: var(--text-secondary); font-size: 1.125rem; font-weight: 500;">إجمالي التقارير</p>
+                </div>
+                <div class="enhanced-stat-card">
+                    <div class="enhanced-stat-number" id="pending-reports">0</div>
+                    <p style="color: var(--text-secondary); font-size: 1.125rem; font-weight: 500;">تقارير قيد المراجعة</p>
+                </div>
+                <div class="enhanced-stat-card">
+                    <div class="enhanced-stat-number">18</div>
+                    <p style="color: var(--text-secondary); font-size: 1.125rem; font-weight: 500;">محافظة مشمولة</p>
+                </div>
+                <div class="enhanced-stat-card">
+                    <div class="enhanced-stat-number" id="total-users">0</div>
+                    <p style="color: var(--text-secondary); font-size: 1.125rem; font-weight: 500;">مستخدم نشط</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Services Section -->
+    <section class="modern-section" style="background-color: var(--background-light);">
+        <div class="container">
+            <h3 class="section-title" style="font-size: 2.5rem;">خدمات سريعة</h3>
+            <div class="enhanced-services-grid">
+                <!-- Service Card 1: Report Side Effects (Prominent) -->
+                <div class="enhanced-service-card">
+                    <div class="service-icon"><i class="fas fa-medkit"></i></div>
+                    <h4 class="service-title">الإبلاغ عن آثار جانبية</h4>
+                    <p class="service-description">ساهم في سلامة الأدوية بالإبلاغ عن أي آثار جانبية.</p>
+                    <a href="report.html" class="service-btn">
+                        <i class="fas fa-plus-circle" style="margin-left: 0.5rem;"></i> إبلاغ الآن
+                    </a>
+                </div>
+                <!-- Service Card 2: Report Intruders -->
+                <div class="enhanced-service-card">
+                    <div class="service-icon"><i class="fas fa-user-slash"></i></div>
+                    <h4 class="service-title">بلاغ الدخلاء</h4>
+                    <p class="service-description">للإبلاغ عن أي شخص غير مؤهل يمارس مهنة الصيدلة.</p>
+                    <a href="report.html#intruder" class="service-btn">
+                        <i class="fas fa-exclamation-triangle" style="margin-left: 0.5rem;"></i> إبلاغ عن دخيل
+                    </a>
+                </div>
+                <!-- Service Card 3: Awareness Information -->
+                <div class="enhanced-service-card">
+                    <div class="service-icon"><i class="fas fa-info-circle"></i></div>
+                    <h4 class="service-title">معلومات توعوية</h4>
+                    <p class="service-description">اكتشف معلومات مفيدة حول سلامة الأدوية والصحة العامة.</p>
+                    <a href="info.html" class="service-btn">
+                        <i class="fas fa-book-open" style="margin-left: 0.5rem;"></i> تصفح المعلومات
+                    </a>
+                </div>
+                <!-- Service Card 4: FAQ -->
+                <div class="enhanced-service-card">
+                    <div class="service-icon"><i class="fas fa-question-circle"></i></div>
+                    <h4 class="service-title">الأسئلة الشائعة</h4>
+                    <p class="service-description">اعثر على إجابات لأسئلتك المتكررة حول المنصة وسلامة الأدوية.</p>
+                    <a href="faq.html" class="service-btn">
+                        <i class="fas fa-comments" style="margin-left: 0.5rem;"></i> تصفح الأسئلة
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Alerts Section -->
+    <section class="modern-section" style="background-color: var(--background-white);">
+        <div class="container">
+            <h3 class="section-title" style="font-size: 2.5rem;">آخر التنبيهات</h3>
+            <div class="alerts-placeholder" id="alerts-container">
+                <p style="color: var(--text-secondary); font-size: 1.125rem; margin-bottom: 1rem;">لا توجد تنبيهات حديثة حاليًا.</p>
+                <a href="info.html#alerts" style="color: var(--primary-color); text-decoration: none; font-weight: 600; font-size: 1rem;">عرض جميع التنبيهات</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="modern-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <!-- About Us -->
+                <div class="footer-section">
+                    <h4>عن المنصة</h4>
+                    <p>
+                        منصة اليقظة الدوائية العراقية هي مبادرة وطنية تهدف إلى بناء نظام قوي لمراقبة سلامة الأدوية وتحسين الصحة العامة في العراق.
+                    </p>
+                </div>
+                <!-- Quick Links -->
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul style="list-style: none;">
+                        <li style="margin-bottom: 0.5rem;"><a href="index.html">الرئيسية</a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="report.html">الإبلاغ</a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="info.html">معلومات توعوية</a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="faq.html">الأسئلة الشائعة</a></li>
+                    </ul>
+                </div>
+                <!-- Contact Info -->
+                <div class="footer-section">
+                    <h4>تواصل معنا</h4>
+                    <p style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <i class="fas fa-map-marker-alt"></i>العراق، بغداد، منطقة الخضراء
+                    </p>
+                    <p style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <i class="fas fa-phone"></i>+964 7xxxxxxxx
+                    </p>
+                    <p style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <i class="fas fa-envelope"></i>info@pharmacovigilance.iq
+                    </p>
+                </div>
+            </div>
+            <div style="border-top: 1px solid #374151; padding-top: 1rem; text-align: center; color: #9ca3af;">
+                &copy; 2025 منصة اليقظة الدوائية العراقية. جميع الحقوق محفوظة.
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="js/app-config.js"></script>
+    <script src="js/error-handler.js"></script>
+    <script src="js/date-formatter.js"></script>
+    <script src="js/form-handler.js"></script>
+    <script src="js/navigation-manager.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

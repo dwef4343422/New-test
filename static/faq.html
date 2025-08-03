@@ -232,6 +232,30 @@
     </style>
 </head>
 <body>
+    <header class="site-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <img src="img/logo.png" alt="منصة اليقظة الدوائية العراقية">
+                </a>
+                
+                <button id="nav-toggle" class="mobile-nav-toggle">
+                    <span class="hamburger"></span>
+                </button>
+
+                <nav id="mobile-menu" class="mobile-menu">
+                    <ul class="nav-list">
+                        <li><a href="index.html" class="nav-link">الرئيسية</a></li>
+                        <li><a href="report.html" class="nav-link">الإبلاغ</a></li>
+                        <li><a href="dashboard.html" class="nav-link">لوحة التحكم</a></li>
+                        <li><a href="faq.html" class="nav-link">الأسئلة الشائعة</a></li>
+                        <li><a href="info.html" class="nav-link">معلومات</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -250,6 +274,14 @@
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
+            </div>
+            <!-- Mobile Menu -->
+            <div class="mobile-menu" id="mobile-menu">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="info.html" class="nav-link">معلومات توعوية</a>
+                <a href="report.html" class="nav-link">الإبلاغ</a>
+                <a href="faq.html" class="nav-link active">الأسئلة الشائعة</a>
+                <a href="dashboard.html" class="nav-link">لوحة التحكم</a>
             </div>
         </div>
     </nav>
@@ -342,7 +374,7 @@
     </footer>
 
     <script src="js/main.js"></script>
-    <script src="js/faq.js"></script>
+    <script src="js/report.js"></script>
 </body>
 </html>
 

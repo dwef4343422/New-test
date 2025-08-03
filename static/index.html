@@ -3,12 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="المنصة الرسمية للإبلاغ عن الآثار الجانبية للأدوية في العراق. ساهم في تحسين سلامة الأدوية وحماية المجتمع من خلال الإبلاغ عن أي آثار جانبية.">
     <title>منصة اليقظة الدوائية العراقية</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <style>
+        /* Base Styles from style.css (included for completeness) */
+        :root {
+            --primary-color: #2c5aa0;
+            --secondary-color: #1e3a8a;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --background-light: #f8fafc;
+            --background-white: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Noto Sans Arabic', Arial, sans-serif;
+            padding-top: 70px; /* To prevent content from being hidden behind the fixed navbar */
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background-color: var(--background-white);
+            box-shadow: var(--shadow-sm);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            position: relative;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .nav-logo i {
+            font-size: 1.5rem;
+        }
+
+        .nav-menu {
+            display: none; /* Hidden on mobile */
+            gap: 1.5rem;
+        }
+
+        .nav-menu .nav-link {
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-menu .nav-link:hover {
+            background-color: var(--background-light);
+            color: var(--primary-color);
+        }
+
+        .nav-menu .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .nav-toggle {
+            display: flex; /* Visible on mobile */
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+        }
+
+        .nav-toggle .bar {
+            width: 25px;
+            height: 3px;
+            background-color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .nav-toggle.active .bar:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .nav-toggle.active .bar:nth-child(2) { opacity: 0; }
+        .nav-toggle.active .bar:nth-child(3) { transform: rotate(-45deg) translate(7px, -6px); }
+
+        .mobile-menu {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            background-color: var(--background-white);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            box-shadow: var(--shadow-md);
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu .nav-link {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        @media (min-width: 768px) {
+            .nav-menu { display: flex; }
+            .nav-toggle { display: none; }
+            .mobile-menu { display: none !important; }
+        }
+        
         /* Additional styles for the new sections */
         .modern-section {
             padding: 60px 0;
@@ -286,6 +418,7 @@
                 <i class="fas fa-shield-alt"></i>
                 <span>اليقظة الدوائية العراقية</span>
             </div>
+            <!-- Desktop Menu -->
             <div class="nav-menu" id="nav-menu">
                 <a href="index.html" class="nav-link active">الرئيسية</a>
                 <a href="info.html" class="nav-link">معلومات توعوية</a>
@@ -294,10 +427,20 @@
                 <a href="dashboard.html" class="nav-link auth-required" style="display: none;">لوحة التحكم</a>
                 <a href="login.html" class="nav-link guest-only">تسجيل الدخول</a>
             </div>
+            <!-- Hamburger Toggle -->
             <div class="nav-toggle" id="nav-toggle">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
+            </div>
+            <!-- Mobile Menu (This was missing) -->
+            <div class="mobile-menu" id="mobile-menu">
+                <a href="index.html" class="nav-link active">الرئيسية</a>
+                <a href="info.html" class="nav-link">معلومات توعوية</a>
+                <a href="report.html" class="nav-link">الإبلاغ</a>
+                <a href="faq.html" class="nav-link">الأسئلة الشائعة</a>
+                <a href="dashboard.html" class="nav-link auth-required" style="display: none;">لوحة التحكم</a>
+                <a href="login.html" class="nav-link guest-only">تسجيل الدخول</a>
             </div>
         </div>
     </nav>
@@ -476,12 +619,7 @@
         </div>
     </footer>
 
-    <!-- JavaScript Files -->
-    <script src="js/app-config.js"></script>
-    <script src="js/error-handler.js"></script>
-    <script src="js/date-formatter.js"></script>
-    <script src="js/form-handler.js"></script>
-    <script src="js/navigation-manager.js"></script>
+    <!-- JavaScript -->
     <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
 </body>

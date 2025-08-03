@@ -3,7 +3,7 @@ from flask import Flask, send_from_directory, jsonify
 from flask_cors import CORS
 from flask_login import login_required
 from extensions import db
-from models import User, DrugAlert, EducationalContent, SystemLog
+from models import User, FAQ, DrugAlert, EducationalContent, SystemLog
 
 from auth import login_manager, auth_bp
 from routes_hybrid import api_bp, user_bp, pharma_bp

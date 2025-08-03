@@ -77,30 +77,18 @@ function populateGovernorateSelects(governorates) {
 function setupFormSubmissions() {
     const form = document.getElementById('pharmacovigilance-form');
     if (form) {
-        // Remove any existing event listeners
-        form.removeEventListener('submit', handleFormSubmit);
-        // Add the event listener
         form.addEventListener('submit', handleFormSubmit);
-        console.log('Form submission handler attached successfully');
-    } else {
-        console.error('Form element not found!');
     }
 }
 
 async function handleFormSubmit(event) {
     event.preventDefault();
-    console.log('Form submit handler called');
     
     // Save final step data
     saveStepData(currentStep);
     
     // Show loading state
     const submitButton = event.target.querySelector('button[type="submit"]');
-    if (!submitButton) {
-        console.error('Submit button not found');
-        return;
-    }
-    
     const originalButtonText = submitButton.innerHTML;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
     submitButton.disabled = true;
@@ -373,34 +361,6 @@ function validateStep(stepNumber) {
         if (ageField && ageField.value && ageField.value.trim()) {
             return true; // Allow progression if age is provided
         }
-    }
-
-    // For step 4 (location and reporter), make reporter fields optional but validate if provided
-    if (stepNumber === 4) {
-        // Check if at least one reporter field is filled
-        const reporterName = currentStepElement.querySelector('input[name="reporter_name"]');
-        const reporterPhone = currentStepElement.querySelector('input[name="reporter_phone"]');
-        const reporterType = currentStepElement.querySelector('select[name="reporter_type"]');
-        
-        // If any reporter field is filled, validate basic requirements
-        if ((reporterName && reporterName.value.trim()) || 
-            (reporterPhone && reporterPhone.value.trim()) || 
-            (reporterType && reporterType.value.trim())) {
-            
-            // If reporter info is provided, require at least name and type
-            if (!reporterName.value.trim()) {
-                reporterName.closest('.form-group').classList.add('error');
-                isValid = false;
-            }
-            if (!reporterType.value.trim()) {
-                reporterType.closest('.form-group').classList.add('error');
-                isValid = false;
-            }
-        }
-        
-        // Always allow progression from step 4 even if reporter fields are empty
-        // This makes reporter information optional
-        return true;
     }
 
     return isValid;

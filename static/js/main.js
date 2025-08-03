@@ -4,18 +4,27 @@
 let currentLanguage = 'ar';
 const API_BASE = '/pharma';
 
-// DOM Content Loaded - Consolidated initialization
+// DOM Content Loaded
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
-    initializeMobileNavigation();
-    enhanceMobileNavigation();
 });
 
-// Initialize the application
+/**
+ * Initializes all global application components.
+ */
 function initializeApp() {
-    loadStatistics();
-    loadLatestAlerts();
-    setupFormValidation();
+    setupMobileNavigation(); // Setup the hamburger menu
+    
+    // Only load these if the elements exist
+    if (document.getElementById('total-reports')) {
+        loadStatistics();
+    }
+    if (document.getElementById('alerts-container')) {
+        loadLatestAlerts();
+    }
+    if (document.querySelector('form')) {
+        setupFormValidation();
+    }
 }
 
 // Load statistics from API
@@ -25,7 +34,54 @@ async function loadStatistics() {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+       
+         
+function setupMobileNavigation() {
+    const navToggle = document.getElementById('nav-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    if (navToggle && mobileMenu) {
+        // Event listener for the hamburger icon click
+        navToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            navToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Close the mobile menu when a link inside it is clicked
+        const mobileLinks = mobileMenu.querySelectorAll('.nav-link');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navToggle.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            });
+        });
+
+        // Close the mobile menu if a user clicks outside of it
+        document.addEventListener('click', (e) => {
+            if (!navToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+                navToggle.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            }
+        });
+    }
+}
+
+/**
+ * Closes the mobile menu when the window is resized to a desktop view.
+ */
+window.addEventListener('resize', function() {
+    const mobileMenu = document.getElementById('mobile-menu');
+    const navToggle = document.getElementById('nav-toggle');
+    
+    if (window.innerWidth > 768) {
+        if (mobileMenu) mobileMenu.classList.remove('active');
+        if (navToggle) navToggle.classList.remove('active');
+    }
+});
+
+
+
         // Check if response is JSON
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
@@ -392,98 +448,6 @@ window.PharmacovigilanceApp = {
     validateForm,
     formatDate,
     formatTime,
-    API_BASE
+    API_BASE,
+    setupMobileNavigation  // Add this line
 };
-
-// Mobile Navigation Toggle Functionality - CONSOLIDATED
-function initializeMobileNavigation() {
-    const navToggle = document.getElementById('nav-toggle');
-    const navMenu = document.getElementById('nav-menu');
-    
-    console.log('Initializing mobile navigation:', { navToggle: !!navToggle, navMenu: !!navMenu });
-    
-    if (navToggle && navMenu) {
-        // Toggle mobile menu
-        navToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            console.log('Hamburger menu clicked');
-            navMenu.classList.toggle('active');
-            navToggle.classList.toggle('active');
-            
-            // Update ARIA attributes
-            const isExpanded = navMenu.classList.contains('active');
-            navToggle.setAttribute('aria-expanded', isExpanded);
-            navMenu.setAttribute('aria-hidden', !isExpanded);
-        });
-        
-        // Close mobile menu when clicking on nav links
-        const navLinks = navMenu.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                navMenu.classList.remove('active');
-                navToggle.classList.remove('active');
-                navToggle.setAttribute('aria-expanded', 'false');
-                navMenu.setAttribute('aria-hidden', 'true');
-            });
-        });
-        
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const isClickInsideNav = navMenu.contains(event.target) || navToggle.contains(event.target);
-            
-            if (!isClickInsideNav && navMenu.classList.contains('active')) {
-                navMenu.classList.remove('active');
-                navToggle.classList.remove('active');
-                navToggle.setAttribute('aria-expanded', 'false');
-                navMenu.setAttribute('aria-hidden', 'true');
-            }
-        });
-        
-        // Close mobile menu on window resize to desktop size
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768) {
-                navMenu.classList.remove('active');
-                navToggle.classList.remove('active');
-                navToggle.setAttribute('aria-expanded', 'false');
-                navMenu.setAttribute('aria-hidden', 'true');
-            }
-        });
-    } else {
-        console.warn('Mobile navigation elements not found:', { navToggle: !!navToggle, navMenu: !!navMenu });
-    }
-}
-
-// Enhanced mobile navigation for better accessibility
-function enhanceMobileNavigation() {
-    const navToggle = document.getElementById('nav-toggle');
-    const navMenu = document.getElementById('nav-menu');
-    
-    if (navToggle && navMenu) {
-        // Add ARIA attributes for accessibility
-        navToggle.setAttribute('aria-label', 'Toggle navigation menu');
-        navToggle.setAttribute('aria-expanded', 'false');
-        navMenu.setAttribute('aria-hidden', 'true');
-        
-        // Handle keyboard navigation
-        navToggle.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                navToggle.click();
-            }
-        });
-        
-        // Handle escape key to close menu
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && navMenu.classList.contains('active')) {
-                navMenu.classList.remove('active');
-                navToggle.classList.remove('active');
-                navToggle.setAttribute('aria-expanded', 'false');
-                navMenu.setAttribute('aria-hidden', 'true');
-                navToggle.focus(); // Return focus to toggle button
-            }
-        });
-    }
-}
-

@@ -339,4 +339,3 @@ window.filterByCategory = filterByCategory;
 window.scrollToFAQ = scrollToFAQ;
 window.addNewFAQ = addNewFAQ;
 window.exportFAQs = exportFAQs;
-

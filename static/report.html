@@ -440,29 +440,37 @@
     </style>
 </head>
 <body>
-    <header class="site-header">
-        <div class="container">
-            <div class="header-content">
-                <a href="index.html" class="logo">
-                    <img src="img/logo.png" alt="منصة اليقظة الدوائية العراقية">
-                </a>
-                
-                <button id="nav-toggle" class="mobile-nav-toggle">
-                    <span class="hamburger"></span>
-                </button>
-
-                <nav id="mobile-menu" class="mobile-menu">
-                    <ul class="nav-list">
-                        <li><a href="index.html" class="nav-link">الرئيسية</a></li>
-                        <li><a href="report.html" class="nav-link">الإبلاغ</a></li>
-                        <li><a href="dashboard.html" class="nav-link">لوحة التحكم</a></li>
-                        <li><a href="faq.html" class="nav-link">الأسئلة الشائعة</a></li>
-                        <li><a href="info.html" class="nav-link">معلومات</a></li>
-                    </ul>
-                </nav>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>اليقظة الدوائية العراقية</span>
+            </div>
+            <div class="nav-menu" id="nav-menu">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="info.html" class="nav-link">معلومات توعوية</a>
+                <a href="report.html" class="nav-link active">الإبلاغ</a>
+                <a href="faq.html" class="nav-link">الأسئلة الشائعة</a>
+                <a href="dashboard.html" class="nav-link auth-required" style="display: none;">لوحة التحكم</a>
+                <a href="login.html" class="nav-link guest-only">تسجيل الدخول</a>
+            </div>
+            <div class="nav-toggle" id="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <!-- Mobile Menu (This was missing) -->
+            <div class="mobile-menu" id="mobile-menu">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="info.html" class="nav-link">معلومات توعوية</a>
+                <a href="report.html" class="nav-link active">الإبلاغ</a>
+                <a href="faq.html" class="nav-link">الأسئلة الشائعة</a>
+                <a href="dashboard.html" class="nav-link auth-required" style="display: none;">لوحة التحكم</a>
+                <a href="login.html" class="nav-link guest-only">تسجيل الدخول</a>
             </div>
         </div>
-    </header>
+    </nav>
 
     <!-- Main Content -->
     <main style="margin-top: 70px;">
@@ -817,6 +825,6 @@
 
     <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
-    <script src="js/faq.js"></script>
+    <script src="js/report.js"></script>
 </body>
 </html>
